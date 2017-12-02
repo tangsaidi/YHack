@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="Felix Zhou">
 
-    <title>Faustin</title>
+    <title>Results</title>
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -27,7 +27,7 @@
     <link href="css/new-age.min.css" rel="stylesheet">
 
     <style>
-    form{
+    form {
       width: 100%;
       padding: 12px 20px;
       margin:0 0;
@@ -40,8 +40,73 @@
       text-align: center;
     }
 
-
+    .wrapper {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
     </style>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      function getParameterByName(name, url) {
+       if (!url) url = window.location.href;
+       name = name.replace(/[\[\]]/g, "\\$&");
+       var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+       results = regex.exec(url);
+       if (!results) return null;
+       if (!results[2]) return '';
+       return decodeURIComponent(results[2].replace(/\+/g, " "));
+      }
+
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+
+        var a = Number(getParameterByName('anger'));
+        var d = Number(getParameterByName('disgust'));
+        var f = Number(getParameterByName('fear'));
+        var j = Number(getParameterByName('joy'));
+        var s = Number(getParameterByName('sadness'));
+
+        var data = google.visualization.arrayToDataTable([
+          ['Emotion', 'Composition of Speech'],
+          ['Anger', a],
+          ['Disgust', d],
+          ['Fear', f],
+          ['Joy', j],
+          ['Sadness', s],
+        ]);
+
+        var options = {
+          title: 'Emotions',
+          backgroundColor: { fill:'lightgrey' },
+          is3D: true,
+
+          width:1000,
+          height:600,
+
+          titleTextStyle: {
+            color: 'purple',
+            fontSize: '30',
+          },
+
+          legend: {
+            textStyle: {
+            color: 'purple',
+            fontSize: '20',
+            }
+          },
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+        chart.draw(data, options);
+      }
+    </script>
+
 
   </head>
 
@@ -50,16 +115,13 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
       <div class="container">
-        <a class="navbar-brand js-scroll-trigger" href="#upload">Start Faustin</a>
+        <a class="navbar-brand js-scroll-trigger" href="#upload">Upload Another</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           Menu
           <i class="fa fa-bars"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#features">Features</a>
-            </li>
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="/">Home</a>
             </li>
@@ -72,98 +134,18 @@
     </nav>
 
     <header class="masthead">
-      <div class="container h-100">
-        <div class="row h-100">
-          <div class="col-lg-7 my-auto">
-            <div class="header-content mx-auto">
-              <h1 class="mb-5">Faustin is a speech to emotion recognition app</h1>
-              <a href="#features" class="btn btn-outline btn-xl js-scroll-trigger">Check out our Features</a>
-            </div>
-          </div>
-          <div class="col-lg-5 my-auto">
-            <div class="device-container">
-              <div class="device-mockup iphone6_plus portrait white">
-                <div class="device">
-                  <div class="screen">
-                    <!-- Demo image for screen mockup, you can put an image here, some HTML, an animation, video, or anything else! -->
-                    <img src="img/call.jpg" class="img-fluid" alt="">
-                  </div>
-                  <div class="button">
-                    <!-- You can hook the "home button" to some JavaScript events or just remove it -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="container">
+        <h1 style="font-size:80px;text-align:center" class="mb-5">Results</h1>
+        <div class="chart" id="piechart_3d" align='center'></div>
       </div>
     </header>
-
-    <section class="features" id="features">
-      <div class="container">
-        <div class="section-heading text-center">
-          <h2>Powerful Features, Unlimited Fun</h2>
-          <p class="text-muted">Check out what you can do with our application</p>
-          <hr>
-        </div>
-        <div class="row">
-          <div class="col-lg-4 my-auto">
-            <div class="device-container">
-              <div class="device-mockup iphone6_plus portrait white">
-                <div class="device">
-                  <div class="screen">
-                    <!-- Demo image for screen mockup, you can put an image here, some HTML, an animation, video, or anything else! -->
-                    <img src="img/call.jpg" class="img-fluid" alt="">
-                  </div>
-                  <div class="button">
-                    <!-- You can hook the "home button" to some JavaScript events or just remove it -->
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-8 my-auto">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="feature-item">
-                    <i class="icon-screen-smartphone text-primary"></i>
-                    <h3>User Friendly</h3>
-                    <p class="text-muted">Ready to use, simply upload a sound file!</p>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-lg-6">
-                  <div class="feature-item">
-                    <i class="icon-present text-primary"></i>
-                    <h3>Free to Use</h3>
-                    <p class="text-muted">Faustin is free to use for any purpose!</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="cta">
-      <div class="cta-content">
-        <div class="container">
-          <h2>Stop waiting.<br>Analyze.</h2>
-          <a href="#upload" class="btn btn-outline btn-xl js-scroll-trigger">Let's Get Started!</a>
-        </div>
-      </div>
-      <div class="overlay"></div>
-    </section>
 
     <section id="upload">
       <div class="containter">
         <!-- change to post /upload -->
         <form method="post" enctype="multipart/form-data" action="/upload">
           <div>
-            <label for="file">Choose file to upload</label><br>
+            <label for="file">Upload Another?</label><br>
             <input type="file" id="file" name="file" multiple><br><br>
           </div>
           <div>
