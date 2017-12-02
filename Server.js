@@ -5,6 +5,9 @@ var router = express.Router();
 var fs = require('fs');
 var path = require("path");
 
+var fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());  
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,8 +31,9 @@ var speech_to_text = new SpeechToTextV1 ({
 
 var text = "";
 
-app.post('/speech2text', function (req, res, next) {
-	var files = [__dirname + '/audio-file.flac'];
+app.post('/audio2emotion', function (req, res, next) {
+
+	var files = [__dirname + '/audio.flac'];
 	//console.log(fs.createReadStream(files[0]));
 	for (var file in files) {
 	  var params = {
@@ -79,8 +83,8 @@ app.post('/speech2text', function (req, res, next) {
 	input = text;
     console.log(input);
 	var params = {
-	  text: input,
-	  tones: 'emotion'
+		text: input,
+		tones: 'emotion'
 	};
 	tone_analyzer.tone(params, function(error, response) {
 	if (error)
@@ -105,9 +109,53 @@ app.post('/text2emotion', function (req, res) {
 	});
 })
 
+var audio;
+
+app.post('/uploadOld', function (req, res, next) {
+		if(!req.files)
+			return res.status(400).send('No audio uploaded');
+
+		audio = req.files.audio;
+
+		audio.mv(__dirname + '/audio.flac', function(err){
+			if(err){
+      			return res.status(500).send(err);
+    			res.send('File uploaded!');
+			}
+	});
+})
+
+var multer = require('multer');
+var AWS = require('aws-sdk');
+var multerS3 = require('multer-s3');
+
+AWS.config.update({
+    accessKeyId: 'AKIAIUQRXK6FIFIYP5YA',
+    secretAccessKey: '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'
+});
+
+var s3 = new AWS.S3();
+
+var upload = multer({
+	storage: multerS3({
+		s3: s3,
+		bucket: 'yhack',
+		metadata: function (req, file, cb) {
+	      cb(null, {fieldName: file.fieldname});
+	    },
+		key: function (req, file, cb){
+			console.log(file);
+			cb(null, 'audio.flac');
+		}
+	})
+})
+
+app.post('/upload', upload.single('audio'), function (req, res, next) {
+    res.send("Uploaded!");
+});
+
 app.get('/index', function (req, res){
 	res.sendFile(path.join(__dirname + '/bootstrap/index.html'));
-
 })
 
 var server = app.listen(port, function () {
