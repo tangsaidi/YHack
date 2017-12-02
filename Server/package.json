@@ -16,5 +16,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "cloud-repo-tools": {
+  "test": {
+    "app": {
+      "msg": "Hello, world!"
+    }
+  },
+  "requiresKeyFile": true,
+  "requiresProjectId": true
+  }
 }
