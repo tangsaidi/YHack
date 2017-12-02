@@ -111,7 +111,7 @@ app.post('/text2emotion', function (req, res) {
 
 var audio;
 
-app.post('/uploadOld', function (req, res, next) {
+app.post('/upload', function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
@@ -120,39 +120,43 @@ app.post('/uploadOld', function (req, res, next) {
 		audio.mv(__dirname + '/audio.flac', function(err){
 			if(err){
       			return res.status(500).send(err);
-    			res.send('File uploaded!');
 			}
+    		res.send('File uploaded!');
 	});
 })
 
-var multer = require('multer');
-var AWS = require('aws-sdk');
-var multerS3 = require('multer-s3');
-
-AWS.config.update({
-    accessKeyId: 'AKIAIUQRXK6FIFIYP5YA',
-    secretAccessKey: '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'
-});
-
-var s3 = new AWS.S3();
-
-var upload = multer({
-	storage: multerS3({
-		s3: s3,
-		bucket: 'yhack',
-		metadata: function (req, file, cb) {
-	      cb(null, {fieldName: file.fieldname});
-	    },
-		key: function (req, file, cb){
-			console.log(file);
-			cb(null, 'audio.flac');
-		}
-	})
+app.get('/getAudio', function(req, res) {
+	res.sendFile(__dirname + '/audio.flac');
 })
 
-app.post('/upload', upload.single('audio'), function (req, res, next) {
-    res.send("Uploaded!");
-});
+// var multer = require('multer');
+// var AWS = require('aws-sdk');
+// var multerS3 = require('multer-s3');
+
+// AWS.config.update({
+//     accessKeyId: 'AKIAIUQRXK6FIFIYP5YA',
+//     secretAccessKey: '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'
+// });
+
+// var s3 = new AWS.S3();
+
+// var upload = multer({
+// 	storage: multerS3({
+// 		s3: s3,
+// 		bucket: 'yhack',
+// 		metadata: function (req, file, cb) {
+// 	      cb(null, {fieldName: file.fieldname});
+// 	    },
+// 		key: function (req, file, cb){
+// 			console.log(file);
+// 			cb(null, 'audio.flac');
+// 		}
+// 	})
+// })
+
+// app.post('/upload', upload.single('audio'), function (req, res, next) {
+//     res.send("Uploaded!");
+// });
 
 app.get('/index', function (req, res){
 	res.sendFile(path.join(__dirname + '/bootstrap/index.html'));
