@@ -104,18 +104,26 @@ app.post('/upload', function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
-		audio = req.files.audio;
+		fs.unlinkSync(__dirname + '/audio.wav');
 
-		audio.mv(__dirname + '/audio.wav', function(err){
-			if(err){
-      			return res.status(500).send(err);
-			}
-    		next();
-	});
+		setTimeout(function() {
+			console.log('Setting Wav');
+			audio = req.files.audio;
+				audio.mv(__dirname + '/audio.wav', function(err){
+					if(err){
+		      			return res.status(500).send(err);
+					}
+		    		next();
+			});
+		}, 3000);
+		
 }, function (req, res, next) {
-	obj = JSON.parse(fs.readFileSync(__dirname + '/json/whatever.json', 'utf8'));
-	console.log(obj);
-	next();
+	setTimeout(function() {
+		console.log('Reading json');
+		obj = JSON.parse(fs.readFileSync(__dirname + '/json/whatever.json', 'utf8'));
+		console.log(obj);
+		next();
+	}, 3000)
 }, function (req, res) {
 	res.writeHead(301,
 	{Location: '/results.html?anger=' 
