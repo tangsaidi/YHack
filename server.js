@@ -29,13 +29,48 @@ var speech_to_text = new SpeechToTextV1 ({
   password: "Vghzb2VvOxE3"
 });
 
-var text;
+var texts = [""];
+var obj;
 
-app.post('/uploadOld', function (req, res, next) {
+app.post('/upload', function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
-		audio = req.files.audio;
+		fs.unlink(__dirname + '/audio.wav', function(err) {
+		    if(err && err.code == 'ENOENT') {
+		        // file doens't exist
+		        console.info("File doesn't exist, won't remove it.");
+		    } else if (err) {
+		        // other errors, e.g. maybe we don't have enough permission
+		        console.error("Error occurred while trying to remove file");
+		    } else {
+		        console.info(`removed`);
+		    }
+		});
+
+		setTimeout(function() {
+			console.log('Setting Wav');
+			var audio = req.files.audio;
+				audio.mv(__dirname + '/audio.wav', function(err){
+					if(err){
+		      			return res.status(500).send(err);
+					}
+		    		next();
+			});
+		}, 3000);
+		
+}, function (req, res, next) {
+	setTimeout(function() {
+		console.log('Reading json');
+		obj = JSON.parse(fs.readFileSync(__dirname + '/json/whatever.json', 'utf8'));
+		console.log(obj);
+		next();
+	}, 3000)
+}, function (req, res, next) {
+		if(!req.files)
+			return res.status(400).send('No audio uploaded');
+
+		var audio = req.files.audio;
 
 		audio.mv(__dirname + '/audio.wav', function(err){
 			if(err){
@@ -65,15 +100,15 @@ app.post('/uploadOld', function (req, res, next) {
 			text = "";
 			for(var i in transcript.results){
 				texts[0] += transcript.results[i].alternatives[0].transcript;
-				console.log(transcript.results[i].alternatives[0].transcript);
+				//console.log(transcript.results[i].alternatives[0].transcript);
 			}
-			console.log(texts[0]);
+			//console.log(texts[0]);
 			next();
 	  });
 	}
 }, function (req, res) {
 	//for(var textsIndex in texts){
-		input = text;
+		input = texts[0];
 	    console.log(input);
 		var params = {
 			text: input,
@@ -86,11 +121,17 @@ app.post('/uploadOld', function (req, res, next) {
 			console.log(JSON.stringify(response,null,2));
 			 res.writeHead(301,
 			  {Location: '/results.html?anger=' 
-			  + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
-			  + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
-			  + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
-			  + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
-			  + response.document_tone.tone_categories[0].tones[4].score*10000}
+			    + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
+			    + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
+			    + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
+			    + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
+			    + response.document_tone.tone_categories[0].tones[4].score*10000 + '&neutral='
+				+ obj[0][0].Neutral*10000 + '&happy='
+				+ obj[0][1].Happy*10000 + '&bitter='
+				+ obj[0][2].Sad*10000 + '&agrresion='
+				+ obj[0][3].Anger*10000 + '&distress='
+				+ obj[0][4].Fear*10000 + '&text='
+				+ texts[0]}
 			);
 			//res.sendFile(__dirname + '/bootstrap/results.html');
 			res.end();
@@ -98,39 +139,14 @@ app.post('/uploadOld', function (req, res, next) {
 	//}
 })
 
-var obj;
 
-app.post('/upload', function (req, res, next) {
-		if(!req.files)
-			return res.status(400).send('No audio uploaded');
-
-		fs.unlinkSync(__dirname + '/audio.wav');
-
-		setTimeout(function() {
-			console.log('Setting Wav');
-			audio = req.files.audio;
-				audio.mv(__dirname + '/audio.wav', function(err){
-					if(err){
-		      			return res.status(500).send(err);
-					}
-		    		next();
-			});
-		}, 3000);
-		
-}, function (req, res, next) {
-	setTimeout(function() {
-		console.log('Reading json');
-		obj = JSON.parse(fs.readFileSync(__dirname + '/json/whatever.json', 'utf8'));
-		console.log(obj);
-		next();
-	}, 3000)
-}, function (req, res) {
+app.post('/upload3', function (req, res) {
 	res.writeHead(301,
-	{Location: '/results.html?anger=' 
-	+ obj[0][0].Neutral*10000 + '&disgust='
-	+ obj[0][1].Happy*10000 + '&fear='
-	+ obj[0][2].Sad*10000 + '&joy='
-	+ obj[0][3].Anger*10000 + '&sadness='
+	{Location: '/results.html?neutral=' 
+	+ obj[0][0].Neutral*10000 + '&happy='
+	+ obj[0][1].Happy*10000 + '&sad='
+	+ obj[0][2].Sad*10000 + '&agrresion='
+	+ obj[0][3].Anger*10000 + '&distress='
 	+ obj[0][4].Fear*10000}
 	);
 	res.end();
