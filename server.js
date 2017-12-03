@@ -97,56 +97,38 @@ app.post('/upload', function (req, res, next) {
 		text = "";
 		for(var i in transcript.results){
 			texts[0] += transcript.results[i].alternatives[0].transcript;
-			//console.log(transcript.results[i].alternatives[0].transcript);
 		}
-		//console.log(texts[0]);
 		next();
 	});
 
 }, function (req, res) {
-	//for(var textsIndex in texts){
-		input = texts[0];
-	    console.log(input);
-		var params = {
-			text: input,
-			tones: 'emotion'
-		};
-		tone_analyzer.tone(params, function(error, response) {
-		if (error)
-			console.log('error:', error);
-		else
-			console.log(JSON.stringify(response,null,2));
-			 res.writeHead(301,
-			  {Location: '/results.html?anger=' 
-			    + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
-			    + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
-			    + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
-			    + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
-			    + response.document_tone.tone_categories[0].tones[4].score*10000 + '&neutral='
-				+ obj[0][0].Neutral*10000 + '&happy='
-				+ obj[0][1].Happy*10000 + '&bitter='
-				+ obj[0][2].Sad*10000 + '&aggresion='
-				+ obj[0][3].Anger*10000 + '&distress='
-				+ obj[0][4].Fear*10000 + '&speech2text='
-				+ texts[0]}
-			);
-			//res.sendFile(__dirname + '/bootstrap/results.html');
-			res.end();
-		});
-	//}
-})
-
-
-app.post('/upload3', function (req, res) {
-	res.writeHead(301,
-	{Location: '/results.html?neutral=' 
-	+ obj[0][0].Neutral*10000 + '&happy='
-	+ obj[0][1].Happy*10000 + '&sad='
-	+ obj[0][2].Sad*10000 + '&agrresion='
-	+ obj[0][3].Anger*10000 + '&distress='
-	+ obj[0][4].Fear*10000}
-	);
-	res.end();
+	input = texts[0];
+    console.log(input);
+	var params = {
+		text: input,
+		tones: 'emotion'
+	};
+	tone_analyzer.tone(params, function(error, response) {
+	if (error)
+		console.log('error:', error);
+	else
+		console.log(JSON.stringify(response,null,2));
+		 res.writeHead(301,
+		  {Location: '/results.html?anger=' 
+		    + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
+		    + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
+		    + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
+		    + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
+		    + response.document_tone.tone_categories[0].tones[4].score*10000 + '&neutral='
+			+ obj[0][0].Neutral*10000 + '&happy='
+			+ obj[0][1].Happy*10000 + '&bitter='
+			+ obj[0][2].Sad*10000 + '&aggresion='
+			+ obj[0][3].Anger*10000 + '&distress='
+			+ obj[0][4].Fear*10000 + '&speech2text='
+			+ texts[0]}
+		);
+		res.end();
+	});
 })
 
 var response;
@@ -175,25 +157,8 @@ app.post('/text', function (req, res, next) {
 			  + response.document_tone.tone_categories[0].tones[4].score*10000 + '&speech2text='
 			  + input}
 			);
-			//res.sendFile(__dirname + '/bootstrap/results.html');
 			res.end();
 		});
-})
-
-var audio;
-
-app.post('/upload2', function (req, res, next) {
-		if(!req.files)
-			return res.status(400).send('No audio uploaded');
-
-		audio = req.files.audio;
-
-		audio.mv(__dirname + '/python_script/demo/audio.wav', function(err){
-			if(err){
-      			return res.status(500).send(err);
-			}
-    		res.send('File uploaded!');
-	});
 })
 
 app.get('/getAudio', function(req, res) {
