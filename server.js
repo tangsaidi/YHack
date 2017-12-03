@@ -29,9 +29,9 @@ var speech_to_text = new SpeechToTextV1 ({
   password: "Vghzb2VvOxE3"
 });
 
-var texts = [];
+var text;
 
-app.post('/upload', function (req, res, next) {
+app.post('/uploadOld', function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
@@ -41,7 +41,6 @@ app.post('/upload', function (req, res, next) {
 			if(err){
       			return res.status(500).send(err);
 			}
-    		//res.send('File uploaded!');
     		next();
 	});
 }, function (req, res, next) {
@@ -63,48 +62,7 @@ app.post('/upload', function (req, res, next) {
 	    if (error)
 	    	console.log('Error:', error);
 	    else
-	    	//console.log(JSON.stringify(transcript, null, 2));
-	    	
-	    	var timeStampsIndex = 0;
-	    	var timeStamps = transcript.results[0].alternatives[0].timestamps;
-
-	    	var speakers = transcript.speaker_labels;
-	    	//console.log(speakers);
-	    	var currentSpeaker = speakers[0].speaker;
-			var text = "";
-			var textsIndex = 0;
-
-	  //   	for(var speakersIndex in speakers){
-	  //   		if(speakers[speakersIndex].speaker != currentSpeaker ||
-	  //   			speakersIndex == speakers.length - 1){
-	  //   			var finalTimeStamp = speakers[speakersIndex].from;
-	  //   			while(timeStamps[timeStampsIndex][2] <= finalTimeStamp){
-	  //   				text += timeStamps[timeStampsIndex][0];
-	  //   				text += " ";
-	  //   				timeStampsIndex++;
-	  //   			}
-	  //   			texts[textsIndex] = text;
-	  //   			currentSpeaker = speakers[speakersIndex].speaker;
-	  //   			textsIndex++;
-	  //   			text = "";
-	  //   		};
-	  //   	}	
-			// text += timeStamps[timeStampsIndex][0];
-			// timeStampsIndex++;
-			// console.log(speakers.length- 1);
-			// console.log(currentSpeaker);
-			// if(speakers.length == 1 || speakers[speakers.length - 2].speaker != speakers[speakers.length - 1].speaker){
-			// 	texts[textsIndex] = text;
-			// }
-			// else{
-			// 	texts[textsIndex-1] += text;
-			// }
-	  //   	console.log(texts);
-	  //   	console.log(textsIndex);
-			// console.log(transcript.results[0].alternatives[0].transcript);
-			// text = transcript.results[0].alternatives[0].transcript;
-			// next();
-			texts[0] = "";
+			text = "";
 			for(var i in transcript.results){
 				texts[0] += transcript.results[i].alternatives[0].transcript;
 				console.log(transcript.results[i].alternatives[0].transcript);
@@ -115,7 +73,7 @@ app.post('/upload', function (req, res, next) {
 	}
 }, function (req, res) {
 	//for(var textsIndex in texts){
-		input = texts[0];
+		input = text;
 	    console.log(input);
 		var params = {
 			text: input,
@@ -138,6 +96,36 @@ app.post('/upload', function (req, res, next) {
 			res.end();
 		});
 	//}
+})
+
+var obj;
+
+app.post('/upload', function (req, res, next) {
+		if(!req.files)
+			return res.status(400).send('No audio uploaded');
+
+		audio = req.files.audio;
+
+		audio.mv(__dirname + '/audio.wav', function(err){
+			if(err){
+      			return res.status(500).send(err);
+			}
+    		next();
+	});
+}, function (req, res, next) {
+	obj = JSON.parse(fs.readFileSync(__dirname + '/json/whatever.json', 'utf8'));
+	console.log(obj);
+	next();
+}, function (req, res) {
+	res.writeHead(301,
+	{Location: '/results.html?anger=' 
+	+ obj[0][0].Neutral*10000 + '&disgust='
+	+ obj[0][1].Happy*10000 + '&fear='
+	+ obj[0][2].Sad*10000 + '&joy='
+	+ obj[0][3].Anger*10000 + '&sadness='
+	+ obj[0][4].Fear*10000}
+	);
+	res.end();
 })
 
 var response;
