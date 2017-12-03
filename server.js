@@ -128,7 +128,7 @@ app.post('/upload', function (req, res, next) {
 			    + response.document_tone.tone_categories[0].tones[4].score*10000 + '&neutral='
 				+ obj[0][0].Neutral*10000 + '&happy='
 				+ obj[0][1].Happy*10000 + '&bitter='
-				+ obj[0][2].Sad*10000 + '&agrresion='
+				+ obj[0][2].Sad*10000 + '&aggresion='
 				+ obj[0][3].Anger*10000 + '&distress='
 				+ obj[0][4].Fear*10000 + '&text='
 				+ texts[0]}
