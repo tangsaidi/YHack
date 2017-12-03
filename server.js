@@ -81,32 +81,28 @@ app.post('/upload', function (req, res, next) {
 	});
 }, function (req, res, next) {
 
-	var files = [__dirname + '/audio.wav'];
-	//console.log(fs.createReadStream(files[0]));
-	for (var file in files) {
-	  var params = {
-	  	speaker_labels: true,
-	    audio: fs.createReadStream(files[file]),
-	    content_type: 'audio/wav',
-	    timestamps: true,
-	    word_alternatives_threshold: 0.9
-	    //keywords: ['colorado', 'tornado', 'tornadoes'],
-	    //keywords_threshold: 0.5
-	  };
+	var file = __dirname + '/audio.wav';
+	var params = {
+		speaker_labels: true,
+	audio: fs.createReadStream(file),
+	content_type: 'audio/wav',
+	timestamps: true,
+	word_alternatives_threshold: 0.9
+	};
 
-	  speech_to_text.recognize(params, function(error, transcript) {
-	    if (error)
-	    	console.log('Error:', error);
-	    else
-			text = "";
-			for(var i in transcript.results){
-				texts[0] += transcript.results[i].alternatives[0].transcript;
-				//console.log(transcript.results[i].alternatives[0].transcript);
-			}
-			//console.log(texts[0]);
-			next();
-	  });
-	}
+	speech_to_text.recognize(params, function(error, transcript) {
+	if (error)
+		console.log('Error:', error);
+	else
+		text = "";
+		for(var i in transcript.results){
+			texts[0] += transcript.results[i].alternatives[0].transcript;
+			//console.log(transcript.results[i].alternatives[0].transcript);
+		}
+		//console.log(texts[0]);
+		next();
+	});
+
 }, function (req, res) {
 	//for(var textsIndex in texts){
 		input = texts[0];
