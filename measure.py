@@ -21,26 +21,19 @@ from os.path import join, basename
 import json
 # from pydub import AudioSegment
 
-sys.path.append("api")
+sys.path.append("python_script/api")
 import Vokaturi
-from pydub import AudioSegment
-from pydub.utils import make_chunks
 
-
-RESULTS_DIR = 'jsons'
+RESULTS_DIR = 'json'
 makedirs(RESULTS_DIR, exist_ok=True)
 myjson = []
 
 print ("Loading library...")
-Vokaturi.load("lib/Vokaturi_mac64.so")
+Vokaturi.load("python_script/lib/Vokaturi_linux64.so")
 print ("Analyzed by: %s" % Vokaturi.versionAndLicense())
 
 print ("Reading sound file...")
 file_name = sys.argv[1]
-
-myaudio = AudioSegment.from_file("myAudio.wav" , "wav") 
-chunk_length_ms = 1000 # pydub calculates in millisec
-chunks = make_chunks(myaudio, chunk_length_ms) #Make chunks of one sec
 
 
 def analyzeAudio(file):
