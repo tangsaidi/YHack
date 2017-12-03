@@ -63,46 +63,53 @@ app.post('/upload', function (req, res, next) {
 	    if (error)
 	    	console.log('Error:', error);
 	    else
-	    	console.log(JSON.stringify(transcript, null, 2));
+	    	//console.log(JSON.stringify(transcript, null, 2));
 	    	
 	    	var timeStampsIndex = 0;
 	    	var timeStamps = transcript.results[0].alternatives[0].timestamps;
 
 	    	var speakers = transcript.speaker_labels;
-	    	console.log(speakers);
+	    	//console.log(speakers);
 	    	var currentSpeaker = speakers[0].speaker;
 			var text = "";
 			var textsIndex = 0;
 
-	    	for(var speakersIndex in speakers){
-	    		if(speakers[speakersIndex].speaker != currentSpeaker ||
-	    			speakersIndex == speakers.length - 1){
-	    			var finalTimeStamp = speakers[speakersIndex].from;
-	    			while(timeStamps[timeStampsIndex][2] <= finalTimeStamp){
-	    				text += timeStamps[timeStampsIndex][0];
-	    				text += " ";
-	    				timeStampsIndex++;
-	    			}
-	    			texts[textsIndex] = text;
-	    			currentSpeaker = speakers[speakersIndex].speaker;
-	    			textsIndex++;
-	    			text = "";
-	    		};
-	    	}	
-			text += timeStamps[timeStampsIndex][0];
-			timeStampsIndex++;
-			console.log(speakers.length- 1);
-			console.log(currentSpeaker);
-			if(speakers.length == 1 || speakers[speakers.length - 2].speaker != speakers[speakers.length - 1].speaker){
-				texts[textsIndex] = text;
+	  //   	for(var speakersIndex in speakers){
+	  //   		if(speakers[speakersIndex].speaker != currentSpeaker ||
+	  //   			speakersIndex == speakers.length - 1){
+	  //   			var finalTimeStamp = speakers[speakersIndex].from;
+	  //   			while(timeStamps[timeStampsIndex][2] <= finalTimeStamp){
+	  //   				text += timeStamps[timeStampsIndex][0];
+	  //   				text += " ";
+	  //   				timeStampsIndex++;
+	  //   			}
+	  //   			texts[textsIndex] = text;
+	  //   			currentSpeaker = speakers[speakersIndex].speaker;
+	  //   			textsIndex++;
+	  //   			text = "";
+	  //   		};
+	  //   	}	
+			// text += timeStamps[timeStampsIndex][0];
+			// timeStampsIndex++;
+			// console.log(speakers.length- 1);
+			// console.log(currentSpeaker);
+			// if(speakers.length == 1 || speakers[speakers.length - 2].speaker != speakers[speakers.length - 1].speaker){
+			// 	texts[textsIndex] = text;
+			// }
+			// else{
+			// 	texts[textsIndex-1] += text;
+			// }
+	  //   	console.log(texts);
+	  //   	console.log(textsIndex);
+			// console.log(transcript.results[0].alternatives[0].transcript);
+			// text = transcript.results[0].alternatives[0].transcript;
+			// next();
+			texts[0] = "";
+			for(var i in transcript.results){
+				texts[0] += transcript.results[i].alternatives[0].transcript;
+				console.log(transcript.results[i].alternatives[0].transcript);
 			}
-			else{
-				texts[textsIndex-1] += text;
-			}
-	    	console.log(texts);
-	    	console.log(textsIndex);
-			console.log(transcript.results[0].alternatives[0].transcript);
-			text = transcript.results[0].alternatives[0].transcript;
+			console.log(texts[0]);
 			next();
 	  });
 	}
@@ -182,46 +189,6 @@ app.post('/upload2', function (req, res, next) {
 app.get('/getAudio', function(req, res) {
 	res.sendFile(__dirname + '/audio.wav');
 })
-
-// var PythonShell = require('python-shell');
-
-// var options = {
-//   args: ['audio.wav']
-// };
-
-// PythonShell.run('/python_script/demo/measure_wav_linux64.py', options, function (err) {
-//   if (err) throw err;
-//   console.log('finished');
-// });
-
-// var multer = require('multer');
-// var AWS = require('aws-sdk');
-// var multerS3 = require('multer-s3');
-
-// AWS.config.update({
-//     accessKeyId: 'AKIAIUQRXK6FIFIYP5YA',
-//     secretAccessKey: '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'
-// });
-
-// var s3 = new AWS.S3();
-
-// var upload = multer({
-// 	storage: multerS3({
-// 		s3: s3,
-// 		bucket: 'yhack',
-// 		metadata: function (req, file, cb) {
-// 	      cb(null, {fieldName: file.fieldname});
-// 	    },
-// 		key: function (req, file, cb){
-// 			console.log(file);
-// 			cb(null, 'audio.wav');
-// 		}
-// 	})
-// })
-
-// app.post('/upload', upload.single('audio'), function (req, res, next) {
-//     res.send("Uploaded!");
-// });
 
 app.get('/index', function (req, res){
 	res.sendFile(path.join(__dirname + '/bootstrap/index.html'));
