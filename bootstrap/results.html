@@ -71,23 +71,24 @@
       google.charts.setOnLoadCallback(drawChart);
       function drawChart() {
 
-        var a = Number(getParameterByName('anger'));
-        var d = Number(getParameterByName('disgust'));
-        var f = Number(getParameterByName('fear'));
-        var j = Number(getParameterByName('joy'));
-        var s = Number(getParameterByName('sadness'));
+        var ang = Number(getParameterByName('anger'));
+        var dis = Number(getParameterByName('disgust'));
+        var fea = Number(getParameterByName('fear'));
+        var joy = Number(getParameterByName('joy'));
+        var sad = Number(getParameterByName('sadness'));
 
-        var data = google.visualization.arrayToDataTable([
-          ['Emotion', 'Composition of Speech'],
-          ['Anger', a],
-          ['Disgust', d],
-          ['Fear', f],
-          ['Joy', j],
-          ['Sadness', s],
+        var dataLan = google.visualization.arrayToDataTable([
+          ['Language Tone', 'Composition of Speech'],
+          ['Anger', ang],
+          ['Disgust', dis],
+          ['Fear', fea],
+          ['Joy', joy],
+          ['Sadness', sad],
         ]);
 
-        var options = {
-          title: 'Emotions',
+
+        var optionsLan = {
+          title: 'Language Tone',
           backgroundColor: { fill:'lightgrey' },
           is3D: true,
 
@@ -107,8 +108,50 @@
           },
         };
 
-        var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
-        chart.draw(data, options);
+        var neu = Number(getParameterByName('neutral'));
+        var ope = Number(getParameterByName('openness'));
+        var bit = Number(getParameterByName('bitter'));
+        var agg = Number(getParameterByName('aggression'));
+        var dist = Number(getParameterByName('distress'));
+
+        var dataEmo = google.visualization.arrayToDataTable([
+          ['Emotional Tone', 'Composition of Speech'],
+          ['Neutral', neu],
+          ['Openness', ope],
+          ['Bitter', bit],
+          ['Aggression', agg],
+          ['Distress', dist],
+        ]);
+
+        var optionsEmo = {
+          title: 'Emotional Tone',
+          backgroundColor: { fill:'lightgrey' },
+          is3D: true,
+
+          width:1000,
+          height:600,
+
+          titleTextStyle: {
+            color: 'purple',
+            fontSize: '30',
+          },
+
+          legend: {
+            textStyle: {
+            color: 'purple',
+            fontSize: '20',
+            }
+          },
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechartLan'));
+        chart.draw(dataLan, optionsLan);
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechartEmo'));
+        chart.draw(dataEmo, optionsEmo);
+
+        var speech2text = getParameterByName('speech2text');
+        document.getElementById('speech2text').innerHTML = speech2text;
       }
     </script>
 
@@ -141,12 +184,25 @@
     <header class="masthead">
       <div class="container">
         <h1 style="font-size:80px;text-align:center" class="mb-5">Results</h1>
-        <div class="chart" id="piechart_3d" align='center'></div>
+        <div class="chart" id="piechartLan" align='center'></div>
       </div>
     </header>
 
+    <header class="masthead">
+      <div class="container">
+        <div class="chart" id="piechartEmo" align='center'></div>
+      </div>
+    </header>
+
+    <section id="speechoutput">
+      <div class="container">
+        <!-- change to post /upload -->
+        <p style="text-align: center" id="speech2text"></p>
+      </div>
+    </section>
+
     <section id="upload">
-      <div class="containter">
+      <div class="container">
         <!-- change to post /upload -->
         <form method="post" enctype="multipart/form-data" action="/upload">
           <div>
@@ -161,7 +217,7 @@
     </section>
 
     <section id="text">
-      <div class="containter">
+      <div class="container">
         <!-- change to post /upload -->
         <form method="post" enctype="multipart/form-data" action="/text">
           <div>
