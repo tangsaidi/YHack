@@ -31,8 +31,10 @@ var speech_to_text = new SpeechToTextV1 ({
 
 var texts = [""];
 var obj;
+var audio;
 
 app.post('/upload', function (req, res, next) {
+		texts[0] = "";
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
@@ -50,7 +52,8 @@ app.post('/upload', function (req, res, next) {
 
 		setTimeout(function() {
 			console.log('Setting Wav');
-			var audio = req.files.audio;
+			audio = req.files.audio;
+			console.log(audio);
 				audio.mv(__dirname + '/audio.wav', function(err){
 					if(err){
 		      			return res.status(500).send(err);
@@ -69,8 +72,6 @@ app.post('/upload', function (req, res, next) {
 }, function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
-
-		var audio = req.files.audio;
 
 		audio.mv(__dirname + '/audio.wav', function(err){
 			if(err){
@@ -130,7 +131,7 @@ app.post('/upload', function (req, res, next) {
 				+ obj[0][1].Happy*10000 + '&bitter='
 				+ obj[0][2].Sad*10000 + '&aggresion='
 				+ obj[0][3].Anger*10000 + '&distress='
-				+ obj[0][4].Fear*10000 + '&text='
+				+ obj[0][4].Fear*10000 + '&speech2text='
 				+ texts[0]}
 			);
 			//res.sendFile(__dirname + '/bootstrap/results.html');
@@ -175,7 +176,8 @@ app.post('/text', function (req, res, next) {
 			  + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
 			  + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
 			  + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
-			  + response.document_tone.tone_categories[0].tones[4].score*10000}
+			  + response.document_tone.tone_categories[0].tones[4].score*10000 + '&speech2text='
+			  + input}
 			);
 			//res.sendFile(__dirname + '/bootstrap/results.html');
 			res.end();
