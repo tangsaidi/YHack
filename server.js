@@ -29,9 +29,22 @@ var speech_to_text = new SpeechToTextV1 ({
   password: "Vghzb2VvOxE3"
 });
 
-var text = "";
+var texts = [];
 
-app.post('/audio2emotion', function (req, res, next) {
+app.post('/upload', function (req, res, next) {
+		if(!req.files)
+			return res.status(400).send('No audio uploaded');
+
+		audio = req.files.audio;
+
+		audio.mv(__dirname + '/audio.flac', function(err){
+			if(err){
+      			return res.status(500).send(err);
+			}
+    		//res.send('File uploaded!');
+    		next();
+	});
+}, function (req, res, next) {
 
 	var files = [__dirname + '/audio.flac'];
 	//console.log(fs.createReadStream(files[0]));
@@ -50,14 +63,16 @@ app.post('/audio2emotion', function (req, res, next) {
 	    if (error)
 	    	console.log('Error:', error);
 	    else
-	    	//console.log(JSON.stringify(transcript, null, 2));
+	    	console.log(JSON.stringify(transcript, null, 2));
 	    	
 	    	var timeStampsIndex = 0;
 	    	var timeStamps = transcript.results[0].alternatives[0].timestamps;
 
 	    	var speakers = transcript.speaker_labels;
 	    	var currentSpeaker = speakers[0].speaker;
-	
+			var text = "";
+			var textsIndex = 0;
+
 	    	for(var speakersIndex in speakers){
 	    		if(speakers[speakersIndex].speaker != currentSpeaker ||
 	    			speakersIndex == speakers.length - 1){
@@ -67,32 +82,54 @@ app.post('/audio2emotion', function (req, res, next) {
 	    				text += " ";
 	    				timeStampsIndex++;
 	    			}
-	    			text += timeStamps[timeStampsIndex][0];
-	    			timeStampsIndex++;
-	    			next();
+	    			texts[textsIndex] = text;
 	    			currentSpeaker = speakers[speakersIndex].speaker;
+	    			textsIndex++;
 	    			text = "";
-	    		}
+	    		};
 	    	}	
+			text += timeStamps[timeStampsIndex][0];
+			timeStampsIndex++;
+			if(speakers[speakers.length- 1].speaker == currentSpeaker){
+				texts[textsIndex-1] += text;
+			}
+			else{
+				texts[textsIndex] = text;
+			}
+	    	console.log(texts);
+	    	console.log(textsIndex);
 			console.log(transcript.results[0].alternatives[0].transcript);
 			text = transcript.results[0].alternatives[0].transcript;
-	  		
+			next();
 	  });
 	}
 }, function (req, res) {
-	input = text;
-    console.log(input);
-	var params = {
-		text: input,
-		tones: 'emotion'
-	};
-	tone_analyzer.tone(params, function(error, response) {
-	if (error)
-		console.log('error:', error);
-	else
-		res.json(JSON.stringify(response, null, 2));
-	});
+	//for(var textsIndex in texts){
+		input = texts[0];
+	    console.log(input);
+		var params = {
+			text: input,
+			tones: 'emotion'
+		};
+		tone_analyzer.tone(params, function(error, response) {
+		if (error)
+			console.log('error:', error);
+		else
+			console.log(JSON.stringify(response,null,2));
+			 res.writeHead(301,
+			  {Location: '/results.html?anger=' 
+			  + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
+			  + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
+			  + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
+			  + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
+			  + response.document_tone.tone_categories[0].tones[4].score*10000}
+			);
+			//res.sendFile(__dirname + '/bootstrap/results.html');
+			res.end();
+		});
+	//}
 })
+
 
 app.post('/text2emotion', function (req, res) {
     var input = req.body.input;
@@ -111,13 +148,13 @@ app.post('/text2emotion', function (req, res) {
 
 var audio;
 
-app.post('/upload', function (req, res, next) {
+app.post('/upload2', function (req, res, next) {
 		if(!req.files)
 			return res.status(400).send('No audio uploaded');
 
 		audio = req.files.audio;
 
-		audio.mv(__dirname + '/audio.flac', function(err){
+		audio.mv(__dirname + '/python_script/demo/audio.flac', function(err){
 			if(err){
       			return res.status(500).send(err);
 			}
@@ -128,6 +165,17 @@ app.post('/upload', function (req, res, next) {
 app.get('/getAudio', function(req, res) {
 	res.sendFile(__dirname + '/audio.flac');
 })
+
+// var PythonShell = require('python-shell');
+
+// var options = {
+//   args: ['audio.flac']
+// };
+
+// PythonShell.run('/python_script/demo/measure_flac_linux64.py', options, function (err) {
+//   if (err) throw err;
+//   console.log('finished');
+// });
 
 // var multer = require('multer');
 // var AWS = require('aws-sdk');
