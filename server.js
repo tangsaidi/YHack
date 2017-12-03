@@ -37,7 +37,7 @@ app.post('/upload', function (req, res, next) {
 
 		audio = req.files.audio;
 
-		audio.mv(__dirname + '/audio.flac', function(err){
+		audio.mv(__dirname + '/audio.wav', function(err){
 			if(err){
       			return res.status(500).send(err);
 			}
@@ -46,13 +46,13 @@ app.post('/upload', function (req, res, next) {
 	});
 }, function (req, res, next) {
 
-	var files = [__dirname + '/audio.flac'];
+	var files = [__dirname + '/audio.wav'];
 	//console.log(fs.createReadStream(files[0]));
 	for (var file in files) {
 	  var params = {
 	  	speaker_labels: true,
 	    audio: fs.createReadStream(files[file]),
-	    content_type: 'audio/flac',
+	    content_type: 'audio/wav',
 	    timestamps: true,
 	    word_alternatives_threshold: 0.9
 	    //keywords: ['colorado', 'tornado', 'tornadoes'],
@@ -69,6 +69,7 @@ app.post('/upload', function (req, res, next) {
 	    	var timeStamps = transcript.results[0].alternatives[0].timestamps;
 
 	    	var speakers = transcript.speaker_labels;
+	    	console.log(speakers);
 	    	var currentSpeaker = speakers[0].speaker;
 			var text = "";
 			var textsIndex = 0;
@@ -90,11 +91,13 @@ app.post('/upload', function (req, res, next) {
 	    	}	
 			text += timeStamps[timeStampsIndex][0];
 			timeStampsIndex++;
-			if(speakers[speakers.length- 1].speaker == currentSpeaker){
-				texts[textsIndex-1] += text;
+			console.log(speakers.length- 1);
+			console.log(currentSpeaker);
+			if(speakers.length == 1 || speakers[speakers.length - 2].speaker != speakers[speakers.length - 1].speaker){
+				texts[textsIndex] = text;
 			}
 			else{
-				texts[textsIndex] = text;
+				texts[textsIndex-1] += text;
 			}
 	    	console.log(texts);
 	    	console.log(textsIndex);
@@ -130,20 +133,34 @@ app.post('/upload', function (req, res, next) {
 	//}
 })
 
+var response;
 
-app.post('/text2emotion', function (req, res) {
-    var input = req.body.input;
+app.post('/text', function (req, res, next) {
+	if(!req.body)
+		return res.status(400).send('No text uploaded');
+
+    var input = req.body.text;
     console.log(input);
 	var params = {
 	  text: input,
 	  tones: 'emotion'
 	};
 	tone_analyzer.tone(params, function(error, response) {
-	if (error)
-		console.log('error:', error);
-	else
-		res.json(JSON.stringify(response, null, 2));
-	});
+		if (error)
+			console.log('error:', error);
+		else
+			console.log(JSON.stringify(response,null,2));
+			 res.writeHead(301,
+			  {Location: '/results.html?anger=' 
+			  + response.document_tone.tone_categories[0].tones[0].score*10000 + '&disgust='
+			  + response.document_tone.tone_categories[0].tones[1].score*10000 + '&fear='
+			  + response.document_tone.tone_categories[0].tones[2].score*10000 + '&joy='
+			  + response.document_tone.tone_categories[0].tones[3].score*10000 + '&sadness='
+			  + response.document_tone.tone_categories[0].tones[4].score*10000}
+			);
+			//res.sendFile(__dirname + '/bootstrap/results.html');
+			res.end();
+		});
 })
 
 var audio;
@@ -154,7 +171,7 @@ app.post('/upload2', function (req, res, next) {
 
 		audio = req.files.audio;
 
-		audio.mv(__dirname + '/python_script/demo/audio.flac', function(err){
+		audio.mv(__dirname + '/python_script/demo/audio.wav', function(err){
 			if(err){
       			return res.status(500).send(err);
 			}
@@ -163,16 +180,16 @@ app.post('/upload2', function (req, res, next) {
 })
 
 app.get('/getAudio', function(req, res) {
-	res.sendFile(__dirname + '/audio.flac');
+	res.sendFile(__dirname + '/audio.wav');
 })
 
 // var PythonShell = require('python-shell');
 
 // var options = {
-//   args: ['audio.flac']
+//   args: ['audio.wav']
 // };
 
-// PythonShell.run('/python_script/demo/measure_flac_linux64.py', options, function (err) {
+// PythonShell.run('/python_script/demo/measure_wav_linux64.py', options, function (err) {
 //   if (err) throw err;
 //   console.log('finished');
 // });
@@ -197,7 +214,7 @@ app.get('/getAudio', function(req, res) {
 // 	    },
 // 		key: function (req, file, cb){
 // 			console.log(file);
-// 			cb(null, 'audio.flac');
+// 			cb(null, 'audio.wav');
 // 		}
 // 	})
 // })
