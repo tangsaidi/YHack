@@ -20,3 +20,6 @@ We learned how to use Vokaturi, IBM Watson and Bootstrap. Beyond these, we have 
 
 # What's next?
 We envision expanding our app to respond to real world applications. To do this, we need improve use of analysis apis. IBM Watson's speech to text can differentiate between different speakers, and Vokaturi can be used to analyze smaller portions of the entire audio file. Inclusion of these features would allow us to detect the emotion for each speaker at a specific time. To represent these improvements, we will also need to make our data visualization more robust by using more informative graphs.
+
+# Try it out?
+http://ec2-18-216-32-253.us-east-2.compute.amazonaws.com:8000
