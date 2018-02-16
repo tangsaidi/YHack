@@ -17,16 +17,16 @@ app.use(express.static(__dirname + '/bootstrap'));
 var ToneAnalyzerV3 = require('watson-developer-cloud/tone-analyzer/v3');
 var tone_analyzer = new ToneAnalyzerV3({
   url: "https://gateway.watsonplatform.net/tone-analyzer/api",
-  username: "fb5e7526-37fa-4abd-bbd0-eb957cb699ad",
-  password: "hCzs3JtsLKip",
+	username: process.env.TAAPIKEY,
+  password: process.env.TAPASS,
   version_date: '2016-05-19'
 });
 
 var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
 var speech_to_text = new SpeechToTextV1 ({
   url: "https://stream.watsonplatform.net/speech-to-text/api",
-  username: "39ecbf24-0782-42b6-bcbe-615e5630a751",
-  password: "Vghzb2VvOxE3"
+  username: process.env.STTKEY,
+  password: process.env.STTPASS
 });
 
 var texts = [""];
